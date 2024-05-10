@@ -98,49 +98,6 @@ router.route('/admin/users').get((req, res) => {
 
 
 
-// // Get All Feedbacks of the selected Instructor
-// router.route('/instructor/feedback/get/:id').get((req, res) => {
-//     try {
-//         prisma.course.findMany({
-//             where: {
-//                 c_InstructorId: req.params.id
-//             },
-//             include: {
-//                 feedback: true
-//             }
-//         }).then(async (courses) => {
-//             if (courses.length === 0) {
-//                 return res.status(404).json({ status: false, message: "No courses found for the specified instructor", code: 404 });
-//             }
-
-//             const feedbackPromises = courses.map(async (course) => {
-//                 const feedback = await prisma.feedback.findMany({
-//                     where: {
-//                         courseId: course.id
-//                     },
-//                     include: {
-//                         course: true,
-//                         user: true
-//                     }
-//                 });
-//                 return feedback;
-//             });
-
-//             Promise.all(feedbackPromises).then((feedbackArrays) => {
-//                 const allFeedbacks = feedbackArrays.flat();
-//                 res.status(200).json({ status: true, message: "Feedbacks retrieved successfully", data: allFeedbacks, count: allFeedbacks.length, code: 200 });
-//             }).catch((error) => {
-//                 console.error("Error finding feedback:", error);
-//                 res.status(500).json({ status: false, message: "Internal Server Error", code: 500 });
-//             });
-//         });
-//     } catch (error) {
-//         console.error("Error finding feedbacks:", error);
-//         res.status(500).json({ status: false, message: "Internal Server Error", code: 500 });
-//     }
-// });
-
-
 // // Function to retreive enrollment informations
 // router.route('/instructor/enrollment/get/:id').get((req, res) => {
 //     try {
@@ -185,29 +142,27 @@ router.route('/admin/users').get((req, res) => {
 
 
 
-// // Delete specific course (Instructor Id should be passed into th body to delete a course)
-// router.route('/course/delete/:id').delete((req, res) => {
-//     const _id = req.params.id
+// Delete the course
+router.route('/course/delete/:id').delete((req, res) => {
+    const _id = req.params.id
 
-//     try {
-//         prisma.course.delete({
-//             where: {
-//                 id: _id,
-//                 c_InstructorId: req.body.c_InstructorId,
-//             },
+    try {
 
-//         }).then((data) => {
-//             if (data) {
-//                 res.status(200).json({ status: true, message: "Course Deleted", data, code: "200" })
-//             } else {
-//                 res.status(404).json({ status: false, message: "Course not found", code: "404" });
-//             }
-//         });
+        prisma.course.delete({
+            where: {
+                id: _id,
+            },
+        }).then((data) => {
+            if (data) {
+                res.status(200).json({ status: true, message: "Course deleted", code: "200" })
+            } else {
+                res.status(404).json({ status: false, message: "Course not found", code: "404" });
+            }
+        });
 
-//     } catch (error) {
-//         res.status(500).json({ status: false, message: "Error while deleting course", code: "500" });
-//         console.log("Error while deleting course", error);
-//     }
-// });
-
+    } catch (error) {
+        res.status(500).json({ status: false, message: "Error while deleting course", code: "500" });
+        console.log("Error while deleting course", error);
+    }
+});
 module.exports = router;
